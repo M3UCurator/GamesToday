@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Games Today | International Friendlies 2026</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --accent: #0f172a;
+      --accent-hover: #1e293b;
+      --border: #e5e7eb;
+      --badge-pre: #fef3c7;
+      --badge-pre-text: #92400e;
+      --badge-live: #fee2e2;
+      --badge-live-text: #991b1b;
+      --badge-ft: #d1fae5;
+      --badge-ft-text: #065f46;
+      --radius: 12px;
+      --shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.5;
+      padding-bottom: 4rem;
+    }
+
+    header {
+      background: var(--accent);
+      color: white;
+      padding: 1.5rem 1rem 1rem;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; }
+    header p { opacity: 0.85; margin-top: 0.25rem; font-size: 0.95rem; }
+
+    .date-filter {
+      background: white;
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 88px;
+      z-index: 9;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+    
+    .date-scroll {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding: 0 1rem;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scroll-behavior: smooth;
+    }
+    
+    .date-scroll::-webkit-scrollbar { display: none; }
+
+    .date-btn {
+      flex-shrink: 0;
+      padding: 0.75rem 1.25rem;
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .date-btn:hover { border-color: var(--accent); background: #f8fafc; }
+    .date-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .game-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .game-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .matchup {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .team {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    .team.away { justify-content: flex-end; text-align: right; }
+    .team img {
+      width: 36px; height: 36px; border-radius: 4px; object-fit: cover; background: #eee;
+    }
+    .score {
+      font-size: 1.4rem; font-weight: 800; padding: 0 1rem; color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .details {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+    }
+    .details span { display: flex; align-items: center; gap: 0.4rem; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.35rem 0.7rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .badge.pre { background: var(--badge-pre); color: var(--badge-pre-text); }
+    .badge.live { background: var(--badge-live); color: var(--badge-live-text); animation: pulse 2s infinite; }
+    .badge.ft { background: var(--badge-ft); color: var(--badge-ft-text); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .empty-state {
+      text-align: center; padding: 4rem 1rem; color: var(--text-secondary);
+    }
+    .empty-state h2 { margin-bottom: 0.5rem; color: var(--text-primary); }
+
+    .desc {
+      text-align: center; margin-top: 0.5rem; font-size: 0.85rem; color: #9ca3af; font-style: italic;
+    }
+
+    .match-count {
+      text-align: center;
+      padding: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      background: white;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 600px) {
+      .matchup { flex-direction: column; gap: 0.5rem; text-align: center; }
+      .team, .team.away { justify-content: center; }
+      .details { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+      .date-btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⚽ International Friendlies</h1>
+    <p id="date-header">Loading...</p>
+  </header>
+
+  <div class="date-filter">
+    <div class="date-scroll" id="date-filter"></div>
+  </div>
+
+  <div class="match-count" id="match-count"></div>
+
+  <main id="games-container"></main>
+
+  <script>
+    // Raw JSON data
+    const rawMatches = [
+      {"id ": "intl-friendly-2026-05-30-1 ", "title ": "Scotland vs Curaçao ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Scotland ", "awayTeam ": "Curaçao ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Hampden Park, Glasgow ", "description ": "Pre-World Cup friendly - Scotland vs Curaçao ", "date ": "2026-05-30 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/sct.png ", "awayFlag ": "https://flagcdn.com/w320/cw.png "},
+      {"id ": "intl-friendly-2026-05-31-1 ", "title ": "Ecuador vs Saudi Arabia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Ecuador ", "awayTeam ": "Saudi Arabia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Red Bull Arena, Harrison, New Jersey ", "description ": "Pre-World Cup friendly - Ecuador vs Saudi Arabia ", "date ": "2026-05-31 ", "dateTime ": "01:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ec.png ", "awayFlag ": "https://flagcdn.com/w320/sa.png "},
+      {"id ": "intl-friendly-2026-05-31-2 ", "title ": "Mexico vs Australia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Mexico ", "awayTeam ": "Australia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Rose Bowl, Pasadena, California ", "description ": "Pre-World Cup friendly - Mexico vs Australia ", "date ": "2026-05-31 ", "dateTime ": "04:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/mx.png ", "awayFlag ": "https://flagcdn.com/w320/au.png "},
+      {"id ": "intl-friendly-2026-05-31-3 ", "title ": "Switzerland vs Jordan ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Switzerland ", "awayTeam ": "Jordan ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Kybunpark, St. Gallen ", "description ": "Pre-World Cup friendly - Switzerland vs Jordan ", "date ": "2026-05-31 ", "dateTime ": "15:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ch.png ", "awayFlag ": "https://flagcdn.com/w320/jo.png "},
+      {"id ": "intl-friendly-2026-05-31-4 ", "title ": "Cape Verde vs Serbia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Cape Verde ", "awayTeam ": "Serbia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estádio do Restelo, Lisbon ", "description ": "Pre-World Cup friendly - Cape Verde vs Serbia ", "date ": "2026-05-31 ", "dateTime ": "16:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cv.png ", "awayFlag ": "https://flagcdn.com/w320/rs.png "},
+      {"id ": "intl-friendly-2026-05-31-5 ", "title ": "United States vs Senegal ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "United States ", "awayTeam ": "Senegal ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Bank of America Stadium, Charlotte, North Carolina ", "description ": "Pre-World Cup friendly - USA vs Senegal ", "date ": "2026-05-31 ", "dateTime ": "21:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/us.png ", "awayFlag ": "https://flagcdn.com/w320/sn.png "},
+      {"id ": "intl-friendly-2026-05-31-6 ", "title ": "Japan vs Iceland ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Japan ", "awayTeam ": "Iceland ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "National Stadium, Tokyo ", "description ": "Pre-World Cup friendly - Japan vs Iceland ", "date ": "2026-05-31 ", "dateTime ": "13:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/jp.png ", "awayFlag ": "https://flagcdn.com/w320/is.png "},
+      {"id ": "intl-friendly-2026-05-31-7 ", "title ": "South Korea vs Trinidad and Tobago ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "South Korea ", "awayTeam ": "Trinidad and Tobago ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Seoul World Cup Stadium, Seoul ", "description ": "Pre-World Cup friendly - South Korea vs Trinidad and Tobago ", "date ": "2026-05-31 ", "dateTime ": "12:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/kr.png ", "awayFlag ": "https://flagcdn.com/w320/tt.png "},
+      {"id ": "intl-friendly-2026-05-31-8 ", "title ": "Czech Republic vs Kosovo ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Czech Republic ", "awayTeam ": "Kosovo ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Fortuna Arena, Prague ", "description ": "Pre-World Cup friendly - Czech Republic vs Kosovo ", "date ": "2026-05-31 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cz.png ", "awayFlag ": "https://flagcdn.com/w320/xk.png "},
+      {"id ": "intl-friendly-2026-06-01-1 ", "title ": "Netherlands vs Algeria ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Netherlands ", "awayTeam ": "Algeria ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Johan Cruijff ArenA, Amsterdam ", "description ": "Pre-World Cup friendly - Netherlands vs Algeria ", "date ": "2026-06-01 ", "dateTime ": "20:45 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/nl.png ", "awayFlag ": "https://flagcdn.com/w320/dz.png "},
+      {"id ": "intl-friendly-2026-06-01-2 ", "title ": "Sweden vs Norway ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Sweden ", "awayTeam ": "Norway ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Friends Arena, Solna ", "description ": "Pre-World Cup friendly - Sweden vs Norway ", "date ": "2026-06-01 ", "dateTime ": "19:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/se.png ", "awayFlag ": "https://flagcdn.com/w320/no.png "},
+      {"id ": "intl-friendly-2026-06-01-3 ", "title ": "Tunisia vs Austria ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Tunisia ", "awayTeam ": "Austria ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade Hammadi Agrebi, Tunis ", "description ": "Pre-World Cup friendly - Tunisia vs Austria ", "date ": "2026-06-01 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/tn.png ", "awayFlag ": "https://flagcdn.com/w320/at.png "},
+      {"id ": "intl-friendly-2026-06-01-4 ", "title ": "Canada vs Uzbekistan ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Canada ", "awayTeam ": "Uzbekistan ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Commonwealth Stadium, Edmonton ", "description ": "Pre-World Cup friendly - Canada vs Uzbekistan (45,000+ tickets sold) ", "date ": "2026-06-01 ", "dateTime ": "03:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ca.png ", "awayFlag ": "https://flagcdn.com/w320/uz.png "},
+      {"id ": "intl-friendly-2026-06-02-1 ", "title ": "Croatia vs Belgium ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Croatia ", "awayTeam ": "Belgium ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stadion Rujevica, Rijeka ", "description ": "Pre-World Cup friendly - Croatia vs Belgium ", "date ": "2026-06-02 ", "dateTime ": "18:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/hr.png ", "awayFlag ": "https://flagcdn.com/w320/be.png "},
+      {"id ": "intl-friendly-2026-06-02-2 ", "title ": "Ghana vs Wales ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Ghana ", "awayTeam ": "Wales ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Accra Sports Stadium, Accra ", "description ": "Pre-World Cup friendly - Ghana vs Wales ", "date ": "2026-06-02 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/gh.png ", "awayFlag ": "https://flagcdn.com/w320/gb-wls.png "},
+      {"id ": "intl-friendly-2026-06-02-3 ", "title ": "Morocco vs Madagascar ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Morocco ", "awayTeam ": "Madagascar ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade Mohammed V, Casablanca ", "description ": "Pre-World Cup friendly - Morocco vs Madagascar ", "date ": "2026-06-02 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ma.png ", "awayFlag ": "https://flagcdn.com/w320/mg.png "},
+      {"id ": "intl-friendly-2026-06-02-4 ", "title ": "Colombia vs Costa Rica ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Colombia ", "awayTeam ": "Costa Rica ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio Metropolitano, Barranquilla ", "description ": "Pre-World Cup friendly - Colombia vs Costa Rica ", "date ": "2026-06-02 ", "dateTime ": "02:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/co.png ", "awayFlag ": "https://flagcdn.com/w320/cr.png "},
+      {"id ": "intl-friendly-2026-06-03-1 ", "title ": "Luxembourg vs Italy ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Luxembourg ", "awayTeam ": "Italy ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade de Luxembourg, Luxembourg City ", "description ": "Pre-World Cup friendly - Luxembourg vs Italy ", "date ": "2026-06-03 ", "dateTime ": "20:45 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/lu.png ", "awayFlag ": "https://flagcdn.com/w320/it.png "},
+      {"id ": "intl-friendly-2026-06-03-2 ", "title ": "DR Congo vs Denmark ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "DR Congo ", "awayTeam ": "Denmark ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade des Martyrs, Kinshasa ", "description ": "Pre-World Cup friendly - DR Congo vs Denmark ", "date ": "2026-06-03 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cd.png ", "awayFlag ": "https://flagcdn.com/w320/dk.png "},
+      {"id ": "intl-friendly-2026-06-03-3 ", "title ": "Haiti vs New Zealand ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Haiti ", "awayTeam ": "New Zealand ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade Sylvio Cator, Port-au-Prince ", "description ": "Pre-World Cup friendly - Haiti vs New Zealand ", "date ": "2026-06-03 ", "dateTime ": "22:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ht.png ", "awayFlag ": "https://flagcdn.com/w320/nz.png "},
+      {"id ": "intl-friendly-2026-06-04-1 ", "title ": "France vs Ivory Coast ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "France ", "awayTeam ": "Ivory Coast ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade de la Beaujoire, Nantes ", "description ": "Pre-World Cup friendly - France vs Ivory Coast ", "date ": "2026-06-04 ", "dateTime ": "21:10 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/fr.png ", "awayFlag ": "https://flagcdn.com/w320/ci.png "},
+      {"id ": "intl-friendly-2026-06-04-2 ", "title ": "Spain vs Iraq ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Spain ", "awayTeam ": "Iraq ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio de La Cartuja, Seville ", "description ": "Pre-World Cup friendly - Spain vs Iraq ", "date ": "2026-06-04 ", "dateTime ": "21:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/es.png ", "awayFlag ": "https://flagcdn.com/w320/iq.png "},
+      {"id ": "intl-friendly-2026-06-04-3 ", "title ": "Greece vs Sweden ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Greece ", "awayTeam ": "Sweden ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Agia Sophia Stadium, Athens ", "description ": "Pre-World Cup friendly - Greece vs Sweden ", "date ": "2026-06-04 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/gr.png ", "awayFlag ": "https://flagcdn.com/w320/se.png "},
+      {"id ": "intl-friendly-2026-06-04-4 ", "title ": "Cyprus vs Slovenia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Cyprus ", "awayTeam ": "Slovenia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "AEK Arena, Larnaca ", "description ": "Pre-World Cup friendly - Cyprus vs Slovenia ", "date ": "2026-06-04 ", "dateTime ": "19:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cy.png ", "awayFlag ": "https://flagcdn.com/w320/si.png "},
+      {"id ": "intl-friendly-2026-06-04-5 ", "title ": "South Korea vs El Salvador ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "South Korea ", "awayTeam ": "El Salvador ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Daejeon World Cup Stadium, Daejeon ", "description ": "Pre-World Cup friendly - South Korea vs El Salvador ", "date ": "2026-06-04 ", "dateTime ": "13:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/kr.png ", "awayFlag ": "https://flagcdn.com/w320/sv.png "},
+      {"id ": "intl-friendly-2026-06-05-1 ", "title ": "Mexico vs Serbia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Mexico ", "awayTeam ": "Serbia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio Nemesio Díez, Toluca ", "description ": "Pre-World Cup friendly - Mexico vs Serbia ", "date ": "2026-06-05 ", "dateTime ": "04:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/mx.png ", "awayFlag ": "https://flagcdn.com/w320/rs.png "},
+      {"id ": "intl-friendly-2026-06-05-2 ", "title ": "Canada vs Republic of Ireland ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Canada ", "awayTeam ": "Republic of Ireland ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Saputo Stadium, Montreal ", "description ": "Pre-World Cup friendly - Canada vs Republic of Ireland ", "date ": "2026-06-05 ", "dateTime ": "01:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ca.png ", "awayFlag ": "https://flagcdn.com/w320/ie.png "},
+      {"id ": "intl-friendly-2026-06-05-3 ", "title ": "Uganda vs Tanzania ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Uganda ", "awayTeam ": "Tanzania ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade de Marrakech, Marrakech ", "description ": "International friendly - Uganda vs Tanzania (neutral venue) ", "date ": "2026-06-05 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ug.png ", "awayFlag ": "https://flagcdn.com/w320/tz.png "},
+      {"id ": "intl-friendly-2026-06-05-4 ", "title ": "Czech Republic vs Guatemala ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Czech Republic ", "awayTeam ": "Guatemala ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stadion města Plzně, Plzeň ", "description ": "Pre-World Cup friendly - Czech Republic vs Guatemala ", "date ": "2026-06-05 ", "dateTime ": "18:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cz.png ", "awayFlag ": "https://flagcdn.com/w320/gt.png "},
+      {"id ": "intl-friendly-2026-06-06-1 ", "title ": "Portugal vs Chile ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Portugal ", "awayTeam ": "Chile ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estádio Nacional, Oeiras ", "description ": "Pre-World Cup friendly - Portugal vs Chile ", "date ": "2026-06-06 ", "dateTime ": "19:45 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/pt.png ", "awayFlag ": "https://flagcdn.com/w320/cl.png "},
+      {"id ": "intl-friendly-2026-06-06-2 ", "title ": "Belgium vs Tunisia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Belgium ", "awayTeam ": "Tunisia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "King Baudouin Stadium, Brussels ", "description ": "Pre-World Cup friendly - Belgium vs Tunisia ", "date ": "2026-06-06 ", "dateTime ": "15:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/be.png ", "awayFlag ": "https://flagcdn.com/w320/tn.png "},
+      {"id ": "intl-friendly-2026-06-06-3 ", "title ": "Australia vs Switzerland ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Australia ", "awayTeam ": "Switzerland ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Snapdragon Stadium, San Diego, California ", "description ": "Pre-World Cup friendly - Australia vs Switzerland ", "date ": "2026-06-06 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/au.png ", "awayFlag ": "https://flagcdn.com/w320/ch.png "},
+      {"id ": "intl-friendly-2026-06-06-4 ", "title ": "United States vs Germany ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "United States ", "awayTeam ": "Germany ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Soldier Field, Chicago, Illinois ", "description ": "Pre-World Cup friendly - USA vs Germany ", "date ": "2026-06-06 ", "dateTime ": "20:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/us.png ", "awayFlag ": "https://flagcdn.com/w320/de.png "},
+      {"id ": "intl-friendly-2026-06-06-5 ", "title ": "England vs New Zealand ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "England ", "awayTeam ": "New Zealand ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Wembley Stadium, London ", "description ": "Pre-World Cup friendly - England vs New Zealand ", "date ": "2026-06-06 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/gb-eng.png ", "awayFlag ": "https://flagcdn.com/w320/nz.png "},
+      {"id ": "intl-friendly-2026-06-06-6 ", "title ": "Brazil vs Egypt ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Brazil ", "awayTeam ": "Egypt ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "MetLife Stadium, East Rutherford, New Jersey ", "description ": "Pre-World Cup friendly - Brazil vs Egypt ", "date ": "2026-06-06 ", "dateTime ": "02:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/br.png ", "awayFlag ": "https://flagcdn.com/w320/eg.png "},
+      {"id ": "intl-friendly-2026-06-06-7 ", "title ": "Bosnia and Herzegovina vs Panama ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Bosnia and Herzegovina ", "awayTeam ": "Panama ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stadion Grbavica, Sarajevo ", "description ": "Pre-World Cup friendly - Bosnia and Herzegovina vs Panama ", "date ": "2026-06-06 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ba.png ", "awayFlag ": "https://flagcdn.com/w320/pa.png "},
+      {"id ": "intl-friendly-2026-06-06-8 ", "title ": "Cape Verde vs Bermuda ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Cape Verde ", "awayTeam ": "Bermuda ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estádio Nacional de Cabo Verde, Praia ", "description ": "Pre-World Cup friendly - Cape Verde vs Bermuda ", "date ": "2026-06-06 ", "dateTime ": "18:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cv.png ", "awayFlag ": "https://flagcdn.com/w320/bm.png "},
+      {"id ": "intl-friendly-2026-06-06-9 ", "title ": "Scotland vs Bolivia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Scotland ", "awayTeam ": "Bolivia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Easter Road, Edinburgh ", "description ": "Pre-World Cup friendly - Scotland vs Bolivia ", "date ": "2026-06-06 ", "dateTime ": "22:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/sct.png ", "awayFlag ": "https://flagcdn.com/w320/bo.png "},
+      {"id ": "intl-friendly-2026-06-06-10 ", "title ": "Qatar vs El Salvador ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Qatar ", "awayTeam ": "El Salvador ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Thani bin Jassim Stadium, Doha ", "description ": "Pre-World Cup friendly - Qatar vs El Salvador ", "date ": "2026-06-06 ", "dateTime ": "19:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/qa.png ", "awayFlag ": "https://flagcdn.com/w320/sv.png "},
+      {"id ": "intl-friendly-2026-06-06-11 ", "title ": "Wales vs Romania ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Wales ", "awayTeam ": "Romania ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Cardiff City Stadium, Cardiff ", "description ": "Pre-World Cup friendly - Wales vs Romania ", "date ": "2026-06-06 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/gb-wls.png ", "awayFlag ": "https://flagcdn.com/w320/ro.png "},
+      {"id ": "intl-friendly-2026-06-06-12 ", "title ": "Haiti vs Peru ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Haiti ", "awayTeam ": "Peru ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade Sylvio Cator, Port-au-Prince ", "description ": "Pre-World Cup friendly - Haiti vs Peru ", "date ": "2026-06-06 ", "dateTime ": "22:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ht.png ", "awayFlag ": "https://flagcdn.com/w320/pe.png "},
+      {"id ": "intl-friendly-2026-06-07-1 ", "title ": "Argentina vs Honduras ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Argentina ", "awayTeam ": "Honduras ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio Único Madre de Ciudades, Santiago del Estero ", "description ": "Pre-World Cup friendly - Argentina vs Honduras ", "date ": "2026-06-07 ", "dateTime ": "02:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ar.png ", "awayFlag ": "https://flagcdn.com/w320/hn.png "},
+      {"id ": "intl-friendly-2026-06-07-2 ", "title ": "Croatia vs Slovenia ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Croatia ", "awayTeam ": "Slovenia ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stadion Anđelko Herjavec, Varaždin ", "description ": "Pre-World Cup friendly - Croatia vs Slovenia ", "date ": "2026-06-07 ", "dateTime ": "20:45 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/hr.png ", "awayFlag ": "https://flagcdn.com/w320/si.png "},
+      {"id ": "intl-friendly-2026-06-07-3 ", "title ": "Greece vs Italy ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Greece ", "awayTeam ": "Italy ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Panthessaliko Stadium, Volos ", "description ": "Pre-World Cup friendly - Greece vs Italy ", "date ": "2026-06-07 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/gr.png ", "awayFlag ": "https://flagcdn.com/w320/it.png "},
+      {"id ": "intl-friendly-2026-06-07-4 ", "title ": "Ecuador vs Guatemala ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Ecuador ", "awayTeam ": "Guatemala ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Lower.com Field, Columbus, Ohio ", "description ": "Pre-World Cup friendly - Ecuador vs Guatemala ", "date ": "2026-06-07 ", "dateTime ": "22:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ec.png ", "awayFlag ": "https://flagcdn.com/w320/gt.png "},
+      {"id ": "intl-friendly-2026-06-07-5 ", "title ": "Morocco vs Norway ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Morocco ", "awayTeam ": "Norway ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade Mohammed V, Casablanca ", "description ": "Pre-World Cup friendly - Morocco vs Norway ", "date ": "2026-06-07 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ma.png ", "awayFlag ": "https://flagcdn.com/w320/no.png "},
+      {"id ": "intl-friendly-2026-06-07-6 ", "title ": "Türkiye vs Venezuela ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Türkiye ", "awayTeam ": "Venezuela ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Ali Sami Yen Spor Kompleksi, Istanbul ", "description ": "Pre-World Cup friendly - Türkiye vs Venezuela ", "date ": "2026-06-07 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/tr.png ", "awayFlag ": "https://flagcdn.com/w320/ve.png "},
+      {"id ": "intl-friendly-2026-06-07-7 ", "title ": "Curaçao vs Aruba ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Curaçao ", "awayTeam ": "Aruba ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Ergilio Hato Stadium, Willemstad ", "description ": "Pre-World Cup friendly - Curaçao vs Aruba ", "date ": "2026-06-07 ", "dateTime ": "02:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cw.png ", "awayFlag ": "https://flagcdn.com/w320/aw.png "},
+      {"id ": "intl-friendly-2026-06-08-1 ", "title ": "France vs Northern Ireland ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "France ", "awayTeam ": "Northern Ireland ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade Pierre-Mauroy, Lille ", "description ": "Pre-World Cup friendly - France vs Northern Ireland ", "date ": "2026-06-08 ", "dateTime ": "21:10 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/fr.png ", "awayFlag ": "https://flagcdn.com/w320/gb-nir.png "},
+      {"id ": "intl-friendly-2026-06-08-2 ", "title ": "Colombia vs Jordan ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Colombia ", "awayTeam ": "Jordan ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio Metropolitano, Barranquilla ", "description ": "Pre-World Cup friendly - Colombia vs Jordan ", "date ": "2026-06-08 ", "dateTime ": "02:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/co.png ", "awayFlag ": "https://flagcdn.com/w320/jo.png "},
+      {"id ": "intl-friendly-2026-06-08-3 ", "title ": "Netherlands vs Uzbekistan ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Netherlands ", "awayTeam ": "Uzbekistan ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "De Kuip, Rotterdam ", "description ": "Pre-World Cup friendly - Netherlands vs Uzbekistan ", "date ": "2026-06-08 ", "dateTime ": "20:45 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/nl.png ", "awayFlag ": "https://flagcdn.com/w320/uz.png "},
+      {"id ": "intl-friendly-2026-06-08-4 ", "title ": "Uganda vs Madagascar ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Uganda ", "awayTeam ": "Madagascar ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade de Marrakech, Marrakech ", "description ": "International friendly - Uganda vs Madagascar (neutral venue) ", "date ": "2026-06-08 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ug.png ", "awayFlag ": "https://flagcdn.com/w320/mg.png "},
+      {"id ": "intl-friendly-2026-06-09-1 ", "title ": "Argentina vs Iceland ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Argentina ", "awayTeam ": "Iceland ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio Mario Alberto Kempes, Córdoba ", "description ": "Pre-World Cup friendly - Argentina vs Iceland ", "date ": "2026-06-09 ", "dateTime ": "02:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/ar.png ", "awayFlag ": "https://flagcdn.com/w320/is.png "},
+      {"id ": "intl-friendly-2026-06-09-2 ", "title ": "DR Congo vs Chile ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "DR Congo ", "awayTeam ": "Chile ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Stade des Martyrs, Kinshasa ", "description ": "Pre-World Cup friendly - DR Congo vs Chile ", "date ": "2026-06-09 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/cd.png ", "awayFlag ": "https://flagcdn.com/w320/cl.png "},
+      {"id ": "intl-friendly-2026-06-09-3 ", "title ": "Spain vs Peru ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Spain ", "awayTeam ": "Peru ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estadio El Molinón, Gijón ", "description ": "Pre-World Cup friendly - Spain vs Peru ", "date ": "2026-06-09 ", "dateTime ": "21:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/es.png ", "awayFlag ": "https://flagcdn.com/w320/pe.png "},
+      {"id ": "intl-friendly-2026-06-10-1 ", "title ": "Portugal vs Nigeria ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Portugal ", "awayTeam ": "Nigeria ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Estádio Dr. Magalhães Pessoa, Leiria ", "description ": "Pre-World Cup friendly - Portugal vs Nigeria ", "date ": "2026-06-10 ", "dateTime ": "21:45 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/pt.png ", "awayFlag ": "https://flagcdn.com/w320/ng.png "},
+      {"id ": "intl-friendly-2026-06-10-2 ", "title ": "England vs Costa Rica ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "England ", "awayTeam ": "Costa Rica ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Wembley Stadium, London ", "description ": "Pre-World Cup friendly - England vs Costa Rica ", "date ": "2026-06-10 ", "dateTime ": "21:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/gb-eng.png ", "awayFlag ": "https://flagcdn.com/w320/cr.png "},
+      {"id ": "intl-friendly-2026-06-10-3 ", "title ": "Saudi Arabia vs Senegal ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Saudi Arabia ", "awayTeam ": "Senegal ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "King Abdullah Sports City, Jeddah ", "description ": "Pre-World Cup friendly - Saudi Arabia vs Senegal ", "date ": "2026-06-10 ", "dateTime ": "20:00 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/sa.png ", "awayFlag ": "https://flagcdn.com/w320/sn.png "},
+      {"id ": "intl-friendly-2026-06-10-4 ", "title ": "Austria vs Guatemala ", "sport ": "Soccer ", "league ": "International Friendly ", "homeTeam ": "Austria ", "awayTeam ": "Guatemala ", "homeScore ": 0, "awayScore ": 0, "status ": "Not Started ", "period ": "Pre-Match ", "gameTimeValue ": null, "gameTime ": " ", "url ": "https://sabctwotasp.cdn.mangomolo.com/sport/smil:sport.stream.smil/chunklist_b1600000_t64NzIwcA==.m3u8 ", "venue ": "Red Bull Arena, Salzburg ", "description ": "Pre-World Cup friendly - Austria vs Guatemala ", "date ": "2026-06-10 ", "dateTime ": "20:30 UTC+2 ", "homeFlag ": "https://flagcdn.com/w320/at.png ", "awayFlag ": "https://flagcdn.com/w320/gt.png "}
+    ];
+
+    // Clean trailing spaces from keys & string values
+    const matches = rawMatches.map(obj => {
+      const cleaned = {};
+      for (let key in obj) {
+        cleaned[key.trim()] = typeof obj[key] === 'string' ? obj[key].trim() : obj[key];
+      }
+      return cleaned;
+    });
+
+    // Get unique dates from matches
+    const uniqueDates = [...new Set(matches.map(m => m.date))].sort();
+    const TARGET_DATE = "2026-05-30";
+    let selectedDate = TARGET_DATE;
+
+    // Format date for display
+    function formatDate(dateStr) {
+      const date = new Date(dateStr + 'T00:00:00');
+      if (dateStr === '2026-05-30') return 'Today';
+      if (dateStr === '2026-05-31') return 'Tomorrow';
+      
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const dayName = days[date.getDay()];
+      const dayNum = date.getDate();
+      const suffix = (n) => {
+        if (n > 3 && n < 21) return 'th';
+        switch (n % 10) {
+          case 1: return 'st'; case 2: return 'nd'; case 3: return 'rd'; default: return 'th';
+        }
+      };
+      return `${dayName} ${dayNum}${suffix(dayNum)}`;
+    }
+
+    // Extract minutes from HH:MM for chronological sorting
+    function extractMinutes(dateTimeStr) {
+      if (!dateTimeStr || typeof dateTimeStr !== 'string') return 0;
+      const match = dateTimeStr.trim().match(/^(\d{1,2}):(\d{2})/);
+      return match ? parseInt(match[1], 10) * 60 + parseInt(match[2], 10) : 0;
+    }
+
+    // Create date filter buttons
+    function createDateFilter() {
+      const container = document.getElementById('date-filter');
+      container.innerHTML = uniqueDates.map(date => `
+        <button class="date-btn ${date === selectedDate ? 'active' : ''}" 
+                data-date="${date}"
+                onclick="filterByDate('${date}')">
+          ${formatDate(date)}
+        </button>
+      `).join('');
+    }
+
+    // Filter matches by date
+    function filterByDate(date) {
+      selectedDate = date;
+      document.querySelectorAll('.date-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.date === date);
+      });
+      const activeBtn = document.querySelector('.date-btn.active');
+      if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      render();
+    }
+
+    function getStatusBadge(status) {
+      const s = status.toLowerCase();
+      if (s.includes('live') || s.includes('1st') || s.includes('2nd') || s.includes('halftime')) return 'live';
+      if (s.includes('finished') || s.includes('ft')) return 'ft';
+      return 'pre';
+    }
+
+    function render() {
+      const container = document.getElementById('games-container');
+      const countEl = document.getElementById('match-count');
+      const dateHeader = document.getElementById('date-header');
+      
+      let filteredMatches = matches.filter(m => m.date === selectedDate);
+      
+      // 🔽 CHRONOLOGICAL SORTING
+      filteredMatches.sort((a, b) => extractMinutes(a.dateTime) - extractMinutes(b.dateTime));
+      
+      dateHeader.textContent = `${formatDate(selectedDate)} • ${filteredMatches.length} Match${filteredMatches.length !== 1 ? 'es' : ''}`;
+      countEl.textContent = filteredMatches.length > 0 
+        ? `${filteredMatches.length} match${filteredMatches.length !== 1 ? 'es' : ''} scheduled`
+        : 'No matches scheduled';
+
+      if (filteredMatches.length === 0) {
+        container.innerHTML = `<div class="empty-state"><h2>No matches scheduled</h2><p>Check back for upcoming fixtures.</p></div>`;
+        return;
+      }
+
+      container.innerHTML = filteredMatches.map(game => {
+        const badgeClass = getStatusBadge(game.status);
+        const badgeText = game.status === 'Not Started' ? 'Pre-Match' : game.status;
+        
+        return `
+          <div class="game-card" id="${game.id}">
+            <div class="matchup">
+              <div class="team home">
+                <img src="${game.homeFlag}" alt="${game.homeTeam} flag" loading="lazy">
+                <span>${game.homeTeam}</span>
+              </div>
+              <div class="score">${game.homeScore} - ${game.awayScore}</div>
+              <div class="team away">
+                <span>${game.awayTeam}</span>
+                <img src="${game.awayFlag}" alt="${game.awayTeam} flag" loading="lazy">
+              </div>
+            </div>
+            <div class="details">
+              <span> ${game.dateTime}</span>
+              <span>📍 ${game.venue}</span>
+              <span class="badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="desc">${game.description}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Initialize
+    createDateFilter();
+    render();
+  </script>
+</body>
+</html>
